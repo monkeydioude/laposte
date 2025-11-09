@@ -1,6 +1,7 @@
 // src/service.ts
 import * as grpc from "@grpc/grpc-js";
-import { BrokerClient, Message, Subscriber } from "./heyo/heyo.ts";
+import { BrokerClient, Message, Subscriber } from "./grpc/heyo_client.ts";
+
 const BROKER_ADDR = process.env.BROKER_ADDR ?? "[::]:8022";
 
 // 1️⃣ Create gRPC client
@@ -21,7 +22,7 @@ stream.on("data", (m: Message) => {
 
 stream.on("end", () => {
     // ???
-  });
+});
 
 stream.on("error", (err) => {
   console.error("Stream error:", err);
