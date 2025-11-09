@@ -7,3 +7,7 @@ dev:
 .PHONY: dexplorer
 dexplorer:
 	docker compose exec event_broker /app/explorer
+
+.PHONY: dbash
+dbash:
+	docker compose exec event_broker bash
