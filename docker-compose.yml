@@ -1,0 +1,5 @@
+services:
+  event_broker:
+    image: drannoc/heyo
+    ports:
+      - 8022:8022
