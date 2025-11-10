@@ -7,7 +7,7 @@ gRPC subscriber that sends a welcome email when it receives the `new.user` event
 
 ## .env
 - `BROKER_ADDR` — gRPC broker address.
-- `SUBSCRIBE_EVENTS` — comma-separated list of events (default: `new.user`).
+- `EVENTS` — comma-separated list of events (default: `new.user`).
 - `SERVICE_ID` — your `clientId` (default: `email-service`).
 - `SERVICE_NAME` — human-readable service name (default: `email-service`).
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` — SMTP configuration parameters.
@@ -18,8 +18,11 @@ gRPC subscriber that sends a welcome email when it receives the `new.user` event
 ```json
 @new.user {"email":"allagultseva@gmail.com","firstname":"Syuzi","lastname":"Dourish"}
 ```
+## Send a message to your broker (event: `delete.user`) with JSON payload:
+```json
+@delete.user {"email":"allagultseva@gmail.com","firstname":"Syuzi","lastname":"Dourish","reason":"user request"}
+```
 
 ## Notes
 - When `DRY_RUN=true`, emails are not sent — they’re logged to console.
 - Set `DRY_RUN=false` to actually send.
-

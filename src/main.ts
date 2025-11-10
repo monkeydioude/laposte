@@ -1,77 +1,69 @@
 import { env } from "./env";
-import * as fs from "fs";
+
 import * as grpc from "@grpc/grpc-js";
 import { BrokerClient, Message, Subscriber } from "./grpc/heyo_client.ts";
 
-import { MessageData } from "./new.user/types.ts";
+import { EventMap} from "./types.ts";
 import { sendMail, sendEmailMock } from "./email.ts";
-import { isValidEmail, ensureNonEmpty } from "./utils.ts"
-import { buildWelcomeEmail } from "./templates/welcome.ts";
+import { buildEmail } from "./buildEmail.ts"
+import { validatePayload } from "./validatePayload.ts";
 
 
 const broker = new BrokerClient(env.BROKER_ADDR, grpc.credentials.createInsecure());
 
-const sub: Subscriber = {
-  event: env.EVENT_NAME,
-  clientId: env.SERVICE_ID,
-  name: env.SERVICE_NAME,
-};
+function handleStreamFor(eventName: keyof EventMap) {
+  const sub: Subscriber = {
+    event: eventName,
+    clientId: env.SERVICE_ID,
+    name: env.SERVICE_NAME,
+  };
+  const stream = broker.subscription(sub);
 
-const stream = broker.subscription(sub);
+  stream.on("data", async (m: Message) => {
+    try {
+      if (m.event !== eventName)
+        return;
 
-// function buildEmail(event: string, payload: Record<string, any>): string {
-//   // a verifier
-//   const buf = fs.readFileSync(`${event}/template.html`);
-//   let html = buf.toString();
-//   for (const [key, value] of Object.entries(payload)) {
-//     // email => {{EMAIL}} : value
-//     html = html.replaceAll(`{{${key.toLocaleUpperCase()}}}`, value);
-//   }
-// }
+      console.log(
+        `Message (${m.clientName || m.clientId || "unknown"}) > @${m.event} ${m.data}`
+      );
 
-stream.on("data", async (m: Message) => {
-  try {
-    if (m.event !== env.EVENT_NAME)
-      return;
+      const raw = JSON.parse(m.data);
+      const payload = validatePayload(eventName, raw);
 
-    console.log(
-      `Message (${m.clientName || m.clientId || "unknown"}) > ` +
-      `@${m.event} ${m.data}`
-    );
+      const built = buildEmail(eventName, payload);
+      const to = (payload as any).email as string;
 
-    const payload: MessageData = JSON.parse(m.data);
+      if (env.DRY_RUN) {
+        await sendEmailMock(to, built.subject, built.text, built.html);
+      } else {
+        await sendMail({ to, subject: built.subject, text: built.text, html: built.html });
+      }
 
-    const email = ensureNonEmpty(payload.email, "email").toLowerCase();
-    const firstname = ensureNonEmpty(payload.firstname, "firstname");
-    const lastname = ensureNonEmpty(payload.lastname, "lastname");
-
-    if (!isValidEmail(email)) {
-      throw new Error("Invalid email format");
-    }
-
-    const { subject, text, html } = buildWelcomeEmail(firstname, lastname, email);
-    // buildEmail("new.event", payload)
-
-    if (env.DRY_RUN) {
-      await sendEmailMock(email, subject, text, html);
-    } else {
-      await sendMail({ to: email, subject, text, html });
-    }
-  
-    console.log(
-      `Message (${m.clientName || m.clientId || "unknown"}) < ${
-        JSON.stringify({ ok: true, to: payload.email })
+      console.log(
+        `Message (${m.clientName || m.clientId || "unknown"}) < ${
+          JSON.stringify({ ok: true, to })
       }`
     );
-  } catch (err: any) {
-    console.error("[handler error]", err?.message || err);
+    } catch (err: any) {
+      console.error("[handler error]", err?.message || err);
+    }
+  });
+
+  stream.on("end", () => {
+    console.warn(`[stream end] server closed the stream for ${eventName}`);
+  });
+
+  stream.on("error", (err: any) => {
+    console.error(`Stream error for ${eventName}:`, err);
+  });
+}
+
+(env.EVENTS as (keyof EventMap)[]).forEach((evt) => {
+  try {
+    handleStreamFor(evt);
+    console.log(`[subscribe] listening for '${evt}' ...`);
+  } catch (e: any) {
+    console.error(`[subscribe error] ${evt}:`, e?.message || e);
   }
-});
-
-stream.on("end", () => {
-  console.warn("[stream end] server closed the stream");
-});
-
-stream.on("error", (err) => {
-  console.error("Stream error:", err);
 });

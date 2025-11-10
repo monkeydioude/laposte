@@ -9,3 +9,13 @@ export function ensureNonEmpty(x: unknown, field: string): string {
   }
   return x.trim();
 }
+
+export function renderTemplate(template: string, payload: Record<string, unknown>): string {
+  let out = template;
+  const entries = Object.entries(payload);
+  for (const [key, value] of entries) {
+    const re = new RegExp(`{{\s*${key.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")}\s*}}`, "gi");
+    out = out.replace(re, String(value ?? ""));
+  }
+  return out;
+}

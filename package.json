@@ -1,5 +1,6 @@
 {
-  "name": "new-user-email-service",
+  "name": "email-event-service",
+  "version": "1.0.0",
   "type": "module",
   "dependencies": {
     "@grpc/grpc-js": "^1.14.1",

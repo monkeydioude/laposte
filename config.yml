@@ -1,0 +1,11 @@
+events:
+  new.user:
+    fields:
+      - email
+      - firstname
+      - lastname
+  delete.user:
+    fields:
+      - email
+      - firstname
+      - lastname

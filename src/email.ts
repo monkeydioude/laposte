@@ -1,12 +1,12 @@
 import nodemailer from "nodemailer";
 
 import { env, requireForSending } from "./env";
-import { MailPayload } from "./new.user/types.ts";
+import { MailPayload } from "./types.ts";
 
 
-export async function sendEmailMock(to: string, subject: string, text: string, html?: string) {
+export async function sendEmailMock(to: string, subject: string, text: string | undefined, html?: string) {
   console.log(
-    `[email MOCK] to=${to} | subject="${subject}" | text="${text.slice(0, 120)}"${html ? " | html=YES" : ""}`
+    `[email MOCK] to=${to} | subject="${subject}" | text="${(text ?? '').slice(0, 120)}"${html ? " | html=YES" : ""}`
   );
 }
 
