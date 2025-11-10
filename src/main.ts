@@ -1,27 +1,51 @@
-// src/service.ts
+import { env } from "./env";
 import * as grpc from "@grpc/grpc-js";
 import { BrokerClient, Message, Subscriber } from "./grpc/heyo_client.ts";
+import { MessageData } from "./new.user/types.ts";
+import { sendEmailMock } from "./email/email.ts";
 
-const BROKER_ADDR = process.env.BROKER_ADDR ?? "[::]:8022";
+const broker = new BrokerClient(env.BROKER_ADDR, grpc.credentials.createInsecure());
 
-// 1️⃣ Create gRPC client
-const broker = new BrokerClient(BROKER_ADDR, grpc.credentials.createInsecure());
-const event = "new.user"
 const sub: Subscriber = {
-  event,
-  clientId: "fastify-service",
-  name: "fastify-service",
+  event: env.EVENT_NAME,
+  clientId: env.SERVICE_ID,
+  name: env.SERVICE_NAME,
 };
 
 const stream = broker.subscription(sub);
 
-stream.on("data", (m: Message) => {
-  console.log(m);
-  // ici ?
+stream.on("data", async (m: Message) => {
+  try {
+    if (m.event !== env.EVENT_NAME)
+      return;
+
+    console.log(
+      `Message (${m.clientName || m.clientId || "unknown"}) > ` +
+      `@${m.event} ${m.data}`
+    );
+
+    const payload: MessageData = JSON.parse(m.data);
+
+    const subject = `Welcome, ${payload.firstname}!`;
+    const text =
+      `Salut ${payload.firstname} ${payload.lastname}!\n` +
+      `Ton email: ${payload.email}\n` +
+      `Bienvenue`;
+
+    await sendEmailMock(payload.email, subject, text);
+
+    console.log(
+      `Message (${m.clientName || m.clientId || "unknown"}) < ${
+        JSON.stringify({ ok: true, to: payload.email })
+      }`
+    );
+  } catch (err: any) {
+    console.error("[handler error]", err?.message || err);
+  }
 });
 
 stream.on("end", () => {
-    // ???
+  console.warn("[stream end] server closed the stream");
 });
 
 stream.on("error", (err) => {
