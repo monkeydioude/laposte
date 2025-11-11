@@ -26,21 +26,6 @@ export async function sendMail(payload: MailPayload): Promise<void> {
     },
   });
 
-  if (env.DRY_RUN) {
-    console.log(
-      "[DRY_RUN] Would send e-mail:",
-      { from: env.SMTP_FROM, ...payload }
-    );
-    try {
-      await transport.verify();
-      console.log("[DRY_RUN] SMTP verify: OK"); 
-    }
-    catch (e: any) {
-      console.warn("[DRY_RUN] SMTP verify failed:", e?.message || e);
-    }
-    return;
-  }
-
   const info = await transport.sendMail({
     from: env.SMTP_FROM!,
     to: payload.to,

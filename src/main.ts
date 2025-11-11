@@ -45,7 +45,6 @@ function handleStreamFor(eventName: string) {
       const lang = resolveLang(payload);
       const built = buildEmail(eventName, payload, lang);
       const to = String(payload.email || payload.to);
-
       if (!to) {
         throw new Error("Missing recipient email in payload");
       }
