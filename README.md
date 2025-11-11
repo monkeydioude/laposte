@@ -1,5 +1,5 @@
 # LAPOSTE
-## new-user-email-service
+## Email Service (config-driven, i18n, history)
 
 Un worker pour envoyer des emails en fonction d'evenement.  
 
@@ -26,3 +26,21 @@ gRPC subscriber that sends a welcome email when it receives the `new.user` event
 ## Notes
 - When `DRY_RUN=true`, emails are not sent — they’re logged to console.
 - Set `DRY_RUN=false` to actually send.
+
+- Subscribes to events from `config.yml` (no hardcoded EventMap).
+- i18n templates (fr/en) per event.
+- History persisted in SQLite (`HISTORY_DB_PATH`) and exposed via HTTP:
+  - `GET /health`
+  - `GET /history?limit=50&email=jane@acme.io&event=new.user`
+  - `POST /history` (optional manual insert for tests)
+
+| URL                                                  | Description                                                |
+|:----------------------------------------------------:|:----------------------------------------------------------:|
+| http://localhost:8080/health                         | Check if the server is running → responds with {"ok":true} |
+| http://localhost:8080/history                        | List of the most recent emails (50 by default)             |
+| http://localhost:8080/history?limit=10               | Limit the result to 10 entries                             |
+| http://localhost:8080/history?event=new.user         | Filter by event type                                       |
+| http://localhost:8080/history?email=test@example.com | Filter by recipient email                                  |
+| http://localhost:8080/events                         | Returns the list of supported events                       |
+
+- Payload may include `lang` (e.g., `fr`), otherwise `LANG_DEFAULT` is used.

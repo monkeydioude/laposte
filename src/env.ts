@@ -8,22 +8,12 @@ function bool(v: string | undefined, def: boolean): boolean {
   return ["1","true","yes","y","on"].includes(v.toLowerCase());
 }
 
-function splitList(v: string | undefined, fallback: string[]): string[] {
-  if (!v || v.trim().length === 0) {
-    return fallback;
-  }
-  return v.split(",").map(s => s.trim()).filter(Boolean);
-}
-
 export const env = {
   BROKER_ADDR: process.env.BROKER_ADDR ?? "[::]:8022",
-  // EVENT_NAME: (process.env.EVENT_NAME ?? "new.user")
-  EVENTS: splitList( // как это прочитать из файла конфигурации ?
-    process.env.EVENTS, 
-    process.env.EVENT_NAME ? [process.env.EVENT_NAME] : ["new.user"]
-  ),
   SERVICE_ID: process.env.SERVICE_ID ?? "email-service",
   SERVICE_NAME: process.env.SERVICE_NAME ?? "email-service",
+
+  CONFIG_PATH: process.env.CONFIG_PATH ?? "./config.yml",
 
   SMTP_HOST: process.env.SMTP_HOST,
   SMTP_PORT: Number(process.env.SMTP_PORT ?? 587),
@@ -31,6 +21,9 @@ export const env = {
   SMTP_PASS: process.env.SMTP_PASS,
   SMTP_FROM: process.env.SMTP_FROM,
   DRY_RUN: bool(process.env.DRY_RUN, true),
+  HTTP_PORT: Number(process.env.HTTP_PORT ?? 8080),
+  HISTORY_DB_PATH: process.env.HISTORY_DB_PATH ?? "./var/history.sqlite",
+  LANG_DEFAULT: process.env.LANG_DEFAULT,
 };
 
 export function requireForSending(): string[] {

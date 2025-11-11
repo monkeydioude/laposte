@@ -1,15 +1,23 @@
 import * as fs from "fs";
 import * as path from "path";
+
 import { renderTemplate } from "./utils";
-import { BuiltEmail } from "./types.ts";
+import { getEventSpec, loadConfig } from "./config";
 
 
-export function buildEmail<T extends object>(
+export function buildEmail(
   event: string,
-  payload: T,
-  templatesRoot = path.resolve(process.cwd(), "templates")
-): BuiltEmail {
-  const dir = path.join(templatesRoot, event);
+  payload: Record<string, unknown>,
+  lang: string
+) {
+  const cfg = loadConfig();
+  const spec = getEventSpec(event);
+  const tplRoot = spec.templates[lang] ?? spec.templates[cfg.languages[0]];
+  if (!tplRoot) {
+    throw new Error(`No templates configured for event '${event}' and language '${lang}'`);
+  }
+
+  const dir = path.resolve(process.cwd(), tplRoot);
   const subjectPath = path.join(dir, "subject.txt");
   const textPath = path.join(dir, "text.txt");
   const htmlPath = path.join(dir, "template.html");
@@ -18,7 +26,11 @@ export function buildEmail<T extends object>(
     throw new Error(`Templates for event '${event}' not found at ${dir}`);
   }
 
-  const dict = payload as unknown as Record<string, unknown>;
+  const dict: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(payload)) {
+    dict[key] = value;
+    dict[key.toUpperCase()] = value;
+  }
 
   const subjectRaw = fs.existsSync(subjectPath) ? fs.readFileSync(subjectPath, "utf8") : "";
   const subject = renderTemplate(subjectRaw.trim(), dict);

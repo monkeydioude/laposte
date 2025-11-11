@@ -1,11 +1,16 @@
+languages: [fr, en]
+
 events:
   new.user:
-    fields:
-      - email
-      - firstname
-      - lastname
+    required: [email, firstname, lastname]
+    optional: []
+    templates:
+      fr: ./templates/fr/new.user
+      en: ./templates/en/new.user
+
   delete.user:
-    fields:
-      - email
-      - firstname
-      - lastname
+    required: [email]
+    optional: [firstname, lastname, reason]
+    templates:
+      fr: ./templates/fr/delete.user
+      en: ./templates/en/delete.user

@@ -1,25 +1,9 @@
-export interface MessageData  {
-  email: string;
-  firstname: string;
-  lastname: string
-  reason?: string;
-}
-
-// TODO: Тут этого не надо, вообще ничего не надо кроме прочтения файла конфигурации
-export interface NewUserMessageData extends MessageData {
-  firstname: string;
-  lastname: string;
-}
-
-export interface DeleteUserMessageData extends MessageData {
-  firstname: string;
-  lastname: string;
-  reason?: string;
-}
-
-export interface EventMap {
-  "new.user": NewUserMessageData;
-  "delete.user": DeleteUserMessageData;
+/** Payload of the email to send */
+export interface MailPayload {
+  to: string;
+  subject: string;
+  text?: string;
+  html?: string;
 }
 
 export interface BuiltEmail {
@@ -28,10 +12,27 @@ export interface BuiltEmail {
   html?: string;
 }
 
-/** Payload of the email to send */
-export interface MailPayload {
-  to: string;
-  subject: string;
-  text?: string;
-  html?: string;
+export type TemplatesByLang = Record<string, string>;
+
+export interface EventSpec {
+  required: string[];
+  optional?: string[];
+  templates: TemplatesByLang;
+}
+
+export interface ServiceConfig {
+  languages: string[];
+  events: Record<string, EventSpec>;
+}
+
+export interface HistoryRow {
+  id?: number;
+  created_at: string;
+  recipient: string;
+  event: string;
+  lang: string;
+  subject?: string;
+  ok: number;
+  error?: string;
+  payload_json: string;
 }

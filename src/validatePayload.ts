@@ -1,36 +1,26 @@
-import { EventMap, NewUserMessageData, DeleteUserMessageData } from "./types.ts";
-import { isValidEmail, ensureNonEmpty } from "./utils.ts"
+import { ensureNonEmpty, isValidEmail } from "./utils";
+import { getEventSpec } from "./config";
 
+export function validatePayload(event: string, raw: any): Record<string, any> {
+  const spec = getEventSpec(event);
+  const p: Record<string, any> = { ...raw };
 
-export function validatePayload<Evt extends keyof EventMap>(event: Evt, payload: any): EventMap[Evt] {
-  if (event === "new.user") {
-    const p = payload as NewUserMessageData;
-    // const p = payload as Record<string, string>;
-  
-    // CA VIENT DE LA CONFIGURATION
-    // const fields = ["email", "firstname", "lastname"];
-    // for (const field in fields) {
-    //  p[field] = ensureNonEmpty(p[field], field).toLowerCase();
-    // }
-    p.firstname = ensureNonEmpty(p.firstname, "firstname");
-    p.lastname = ensureNonEmpty(p.lastname, "lastname");
-  
-    if (!isValidEmail(p.email)) {
-      throw new Error("Invalid email format");
-    }
-    return p as EventMap[Evt];
+  for (const f of spec.required) {
+    p[f] = ensureNonEmpty(p[f], f);
   }
 
-  if (event === "delete.user") {
-    const p = payload as DeleteUserMessageData;
-
+  if ("email" in p) {
     p.email = ensureNonEmpty(p.email, "email").toLowerCase();
-
     if (!isValidEmail(p.email)) {
       throw new Error("Invalid email format");
     }
-    return p as EventMap[Evt];
   }
 
-  throw new Error(`Unsupported event '${String(event)}'`);
+  for (const f of (spec.optional ?? [])) {
+    if (p[f] !== undefined && p[f] !== null) {
+      p[f] = String(p[f]);
+    }
+  }
+
+  return p;
 }
