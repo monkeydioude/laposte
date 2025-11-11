@@ -5,6 +5,7 @@ import path from "path";
 import { env } from "./env";
 import { HistoryRow } from "./types"
 
+
 const dir = path.dirname(env.HISTORY_DB_PATH);
 if (!fs.existsSync(dir)) {
   fs.mkdirSync(dir, { recursive: true });

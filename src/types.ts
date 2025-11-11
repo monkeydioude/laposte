@@ -12,16 +12,20 @@ export interface BuiltEmail {
   html?: string;
 }
 
-export type TemplatesByLang = Record<string, string>;
+export interface TemplatesRoot {
+  path: string;
+  langs: string[];
+}
 
 export interface EventSpec {
   required: string[];
   optional?: string[];
-  templates: TemplatesByLang;
+  /** folder name under templates path, e.g. 'new.user' */
+  template: string;
 }
 
 export interface ServiceConfig {
-  languages: string[];
+  templates: TemplatesRoot;
   events: Record<string, EventSpec>;
 }
 
@@ -35,4 +39,12 @@ export interface HistoryRow {
   ok: number;
   error?: string;
   payload_json: string;
+}
+
+export interface SmtpConfig {
+  host: string;
+  port: number;
+  user: string;
+  pass: string;
+  from: string;
 }

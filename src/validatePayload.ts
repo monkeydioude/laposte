@@ -1,6 +1,7 @@
 import { ensureNonEmpty, isValidEmail } from "./utils";
 import { getEventSpec } from "./config";
 
+
 export function validatePayload(event: string, raw: any): Record<string, any> {
   const spec = getEventSpec(event);
   const p: Record<string, any> = { ...raw };

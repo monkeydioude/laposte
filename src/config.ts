@@ -19,14 +19,23 @@ export function loadConfig(): ServiceConfig {
   }
 
   const raw = fs.readFileSync(p, "utf8");
-  const data = yaml.load(raw) as ServiceConfig;
-  if (!data || typeof data !== "object" || !data.events) {
+  const data = yaml.load(raw) as any;
+
+  if (!data || typeof data !== "object") {
+    throw new Error("Invalid config: expected YAML object");
+  }
+  if (!data.templates || !data.templates.path) {
+    throw new Error("Invalid config: missing 'templates.path'");
+  }
+  if (!Array.isArray(data.templates.langs) || data.templates.langs.length === 0) {
+    data.templates.langs = [env.LANG_DEFAULT || "fr"];
+  }
+  if (!data.events || typeof data.events !== "object") {
     throw new Error("Invalid config: missing 'events'");
   }
 
-  data.languages = data.languages ?? ["fr"];
-  cached = data;
-  return data;
+  cached = data as ServiceConfig;
+  return cached!;
 }
 
 export function getEventSpec(event: string): EventSpec {

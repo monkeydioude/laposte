@@ -7,7 +7,7 @@ import { makeMailer, sendEmailMock } from "./email.ts";
 import { buildEmail } from "./buildEmail.ts"
 import { validatePayload } from "./validatePayload.ts";
 
-import { insertHistory } from "./db.ts";
+import { insertHistory } from "./db";
 import { createHttpServer } from "./http.ts";
 import { supportedEvents, resolveLang } from "./utils.ts"
 
@@ -15,6 +15,7 @@ import { supportedEvents, resolveLang } from "./utils.ts"
 const broker = new BrokerClient(env.BROKER_ADDR, grpc.credentials.createInsecure());
 
 const missing = requireForSending();
+
 const mailer = !env.DRY_RUN
   ? makeMailer({
       host: env.SMTP_HOST!,
@@ -62,7 +63,7 @@ function handleStreamFor(eventName: string) {
         `Message (${m.clientName || m.clientId || "unknown"}) < ${
           JSON.stringify({ ok: true, to })
       }`);
-      insertHistory({
+      await insertHistory({
         created_at: new Date().toISOString(),
         recipient: to,
         event: eventName,
@@ -84,7 +85,7 @@ function handleStreamFor(eventName: string) {
         })();
         const payload = typeof raw === "object" && raw ? raw : {};
         const lang = resolveLang(payload as any);
-        insertHistory({
+        await insertHistory({
           created_at: new Date().toISOString(),
           recipient: String((payload as any).email || (payload as any).to || ""),
           event: eventName,

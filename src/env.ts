@@ -22,8 +22,16 @@ export const env = {
   SMTP_FROM: process.env.SMTP_FROM,
   DRY_RUN: bool(process.env.DRY_RUN, true),
   HTTP_PORT: Number(process.env.HTTP_PORT ?? 8080),
+  LANG_DEFAULT: process.env.LANG_DEFAULT ?? "fr",
+  
   HISTORY_DB_PATH: process.env.HISTORY_DB_PATH ?? "./var/history.sqlite",
-  LANG_DEFAULT: process.env.LANG_DEFAULT,
+  // Postgres
+  // POSTGRES_URL: process.env.POSTGRES_URL,
+  // PGHOST: process.env.PGHOST,
+  // PGPORT: process.env.PGPORT ? Number(process.env.PGPORT) : undefined,
+  // PGUSER: process.env.PGUSER,
+  // PGPASSWORD: process.env.PGPASSWORD,
+  // PGDATABASE: process.env.PGDATABASE,
 };
 
 export function requireForSending(): string[] {
