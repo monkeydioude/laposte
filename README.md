@@ -7,12 +7,15 @@ gRPC subscriber that sends a welcome email when it receives the `new.user` event
 
 ## .env
 - `BROKER_ADDR` — gRPC broker address.
-- `EVENTS` — comma-separated list of events (default: `new.user`).
 - `SERVICE_ID` — your `clientId` (default: `email-service`).
 - `SERVICE_NAME` — human-readable service name (default: `email-service`).
+- `CONFIG_PATH` - Path to the YAML configuration file defining events and templates (default: `./config.yml`).
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` — SMTP configuration parameters.
 - `SMTP_FROM` — sender email address (required).
 - `DRY_RUN` — if `true`, emails are not sent but only logged.
+- `HTTP_PORT` - Port for the HTTP API server (default: `8080`).
+- `HISTORY_DB_PATH` - Path to the SQLite history database file (default: `./var/history.sqlite`).
+- `LANG_DEFAULT` - Default language used for templates.
 
 ## Send a message to your broker (event: `new.user`) with JSON payload:
 ```json
