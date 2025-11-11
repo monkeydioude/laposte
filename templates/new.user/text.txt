@@ -1,0 +1,3 @@
+Salut {{FIRSTNAME}} {{LASTNAME}} !
+Ton email: {{EMAIL}}
+Bienvenue !

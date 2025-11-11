@@ -7,7 +7,7 @@ import { BuiltEmail } from "./types.ts";
 export function buildEmail<T extends object>(
   event: string,
   payload: T,
-  templatesRoot = path.resolve(process.cwd(), "src", "templates")
+  templatesRoot = path.resolve(process.cwd(), "templates")
 ): BuiltEmail {
   const dir = path.join(templatesRoot, event);
   const subjectPath = path.join(dir, "subject.txt");
