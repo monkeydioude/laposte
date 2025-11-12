@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 
 import { env } from "./env";
-import { MailPayload, SmtpConfig } from "./types.ts";
+import { type MailPayload, type SmtpConfig } from "./types";
 
 
 export function validateMailPayload(p: MailPayload): void {

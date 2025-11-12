@@ -18,4 +18,9 @@ dpsql:
 
 .PHONY: build
 build:
+	rm -rf build
 	npm run build
+
+.PHONY: prod
+prod: build
+	node dist/main.js

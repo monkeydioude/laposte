@@ -12,6 +12,7 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
+    "tsup": "^8.5.0",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.10.1",
     "@types/nodemailer": "^7.0.3",
@@ -23,6 +24,6 @@
   },
   "scripts": {
     "dev": "tsx watch src/main.ts",
-    "build": "tsc"
+    "build": "tsup src/main.ts --format esm,cjs --dts --sourcemap --clean --out-dir dist"
   }
 }

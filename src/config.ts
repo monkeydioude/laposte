@@ -3,7 +3,7 @@ import yaml from "js-yaml";
 import path from "path";
 
 import { env } from "./env";
-import { EventSpec, ServiceConfig } from "./types.ts"
+import { type EventSpec, type ServiceConfig } from "./types";
 
 
 let cached: ServiceConfig | null = null;

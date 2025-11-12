@@ -1,16 +1,16 @@
 import { env, requireForSending } from "./env";
 
 import * as grpc from "@grpc/grpc-js";
-import { BrokerClient, Message, Subscriber } from "./grpc/heyo_client.ts";
+import { BrokerClient, Message, Subscriber } from "./grpc/heyo_client";
 
-import { buildEmail } from "./buildEmail.ts";
-import { makeMailer, sendEmailMock } from "./email.ts";
-import { validatePayload } from "./validatePayload.ts";
+import { buildEmail } from "./buildEmail";
+import { makeMailer, sendEmailMock } from "./email";
+import { validatePayload } from "./validatePayload";
 
 import { v4 } from "uuid";
-import { insertHistory } from "./db.ts";
-import { createHttpServer } from "./http.ts";
-import { resolveLang, supportedEvents } from "./utils.ts";
+import { insertHistory } from "./db";
+import { createHttpServer } from "./http";
+import { resolveLang, supportedEvents } from "./utils";
 
 
 const broker = new BrokerClient(env.BROKER_ADDR, grpc.credentials.createInsecure());

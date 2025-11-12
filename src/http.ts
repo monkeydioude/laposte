@@ -2,7 +2,7 @@ import Fastify from "fastify";
 
 import { loadConfig } from "./config";
 import { queryHistory } from "./db";
-import { HistoryRow } from "./types";
+import { type HistoryRow } from "./types";
 
 
 export function createHttpServer() {

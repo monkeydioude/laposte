@@ -1,7 +1,7 @@
 import { Pool } from "pg";
 
 import { env } from "./env";
-import { HistoryRow } from "./types";
+import { type HistoryRow } from "./types";
 
 function buildPool(): Pool {
   // if (env.POSTGRES_URL) {

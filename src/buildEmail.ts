@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
 
-import { renderTemplate } from "./utils";
 import { getEventSpec, loadConfig } from "./config";
+import { renderTemplate } from "./utils";
 
 
 export function buildEmail(
@@ -18,7 +18,7 @@ export function buildEmail(
     const root = cfg.templates.path;
     const effectiveLang = langs.includes(lang) ? lang : langs[0];
 
-    const dir = path.resolve(process.cwd(), root, spec.template, effectiveLang);
+    const dir = path.resolve(process.cwd(), root, spec.template, effectiveLang!);
     const subjectPath = path.join(dir, "subject.txt");
     const textPath = path.join(dir, "text.txt");
     const htmlPath = path.join(dir, "template.html");
