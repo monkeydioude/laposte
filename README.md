@@ -1,6 +1,7 @@
 # LAPOSTE
 ## Email Service (config-driven, i18n, history)
 
+An event-driven email sending worker.
 Un worker pour envoyer des emails en fonction d'evenement.  
 
 gRPC subscriber that sends a welcome email when it receives the `new.user` event.

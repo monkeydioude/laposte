@@ -4,9 +4,6 @@ import { env } from "./env";
 import { type HistoryRow } from "./types";
 
 function buildPool(): Pool {
-  // if (env.POSTGRES_URL) {
-  //   return new Pool({ connectionString: env.POSTGRES_URL });
-  // }
   return new Pool({
     host: env.PGHOST || "localhost",
     port: env.PGPORT || 5432,

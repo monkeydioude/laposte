@@ -25,8 +25,6 @@ export const env = {
   LANG_DEFAULT: process.env.LANG_DEFAULT ?? "fr",
   
   HISTORY_DB_PATH: process.env.HISTORY_DB_PATH ?? "./var/history.sqlite",
-  // Postgres
-  // POSTGRES_URL: process.env.POSTGRES_URL,
   PGHOST: process.env.PGHOST,
   PGPORT: process.env.PGPORT ? Number(process.env.PGPORT) : undefined,
   PGUSER: process.env.PGUSER,
