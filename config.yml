@@ -1,0 +1,14 @@
+templates:
+  path: ./templates
+  langs: [fr, en]
+
+events:
+  new.user:
+    required: [email, firstname, lastname]
+    optional: []
+    template: new.user
+
+  delete.user:
+    required: [email]
+    optional: [firstname, lastname, reason]
+    template: delete.user

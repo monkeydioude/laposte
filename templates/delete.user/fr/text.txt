@@ -1,0 +1,4 @@
+Bonjour {{FIRSTNAME}} {{LASTNAME}},
+Nous confirmons la suppression de votre compte associé à {{EMAIL}} a été supprimé.
+{{#IF_REASON}}Raison: {{REASON}}{{/IF_REASON}}
+Si ce n'était pas vous, contactez le support.

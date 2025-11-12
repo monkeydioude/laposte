@@ -1,0 +1,41 @@
+services:
+  event_broker:
+    image: drannoc/heyo
+    ports:
+      - 8022:8022
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${PGUSER}
+      POSTGRES_PASSWORD: ${PGPASSWORD}
+      POSTGRES_DB: ${PGDATABASE}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "${PGPORT}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PGUSER} -d ${PGDATABASE} -h ${PGHOST}"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+
+  migrate:
+    image: postgres:16
+    container_name: db_migrate
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGUSER: ${PGUSER}
+      PGPASSWORD: ${PGPASSWORD}
+      PGDATABASE: ${PGDATABASE}
+      PGHOST: db
+    volumes:
+      - ./migrations:/migrations
+    entrypoint: ["/migrations/run-migrations.sh"]
+    restart: "no"
+  
+
+volumes:
+  pgdata:
