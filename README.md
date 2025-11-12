@@ -4,7 +4,7 @@
 An event-driven email sending worker.  
 Un worker pour envoyer des emails en fonction d'evenement.  
 
-gRPC subscriber that sends a welcome email when it receives the `new.user` event.
+Listen to events through a gRPC event broken and send emails accordingly.
 
 ## .env
 - `BROKER_ADDR` — gRPC broker address.
@@ -17,11 +17,11 @@ gRPC subscriber that sends a welcome email when it receives the `new.user` event
 - `HTTP_PORT` - Port for the HTTP API server (default: `8080`).
 - `LANG_DEFAULT` - Default language used for templates.
 
-## Send a message to your broker (event: `new.user`) with JSON payload:
+## With the broker explorer (make dexplorer), send a message to your broker (event: `new.user`) with JSON payload:
 ```
 @new.user {"email":"email@email.com","firstname":"Syuzi","lastname":"Dourish"}
 ```
-## Send a message to your broker (event: `delete.user`) with JSON payload:
+## With the broker explorer (make dexplorer), send a message to your broker (event: `delete.user`) with JSON payload:
 ```
 @delete.user {"email":"email@email.com","firstname":"Syuzi","lastname":"Dourish","reason":"user request"}
 ```
