@@ -1,7 +1,7 @@
 # LAPOSTE
 ## Email Service (config-driven, i18n, history)
 
-An event-driven email sending worker.
+An event-driven email sending worker.  
 Un worker pour envoyer des emails en fonction d'evenement.  
 
 gRPC subscriber that sends a welcome email when it receives the `new.user` event.
@@ -15,15 +15,14 @@ gRPC subscriber that sends a welcome email when it receives the `new.user` event
 - `SMTP_FROM` — sender email address (required).
 - `DRY_RUN` — if `true`, emails are not sent but only logged.
 - `HTTP_PORT` - Port for the HTTP API server (default: `8080`).
-- `HISTORY_DB_PATH` - Path to the SQLite history database file (default: `./var/history.sqlite`).
 - `LANG_DEFAULT` - Default language used for templates.
 
 ## Send a message to your broker (event: `new.user`) with JSON payload:
-```json
+```
 @new.user {"email":"email@email.com","firstname":"Syuzi","lastname":"Dourish"}
 ```
 ## Send a message to your broker (event: `delete.user`) with JSON payload:
-```json
+```
 @delete.user {"email":"email@email.com","firstname":"Syuzi","lastname":"Dourish","reason":"user request"}
 ```
 
@@ -33,7 +32,7 @@ gRPC subscriber that sends a welcome email when it receives the `new.user` event
 
 - Subscribes to events from `config.yml` (no hardcoded EventMap).
 - i18n templates (fr/en) per event.
-- History persisted in SQLite (`HISTORY_DB_PATH`) and exposed via HTTP:
+- History persisted in PostgreSQL and exposed via HTTP:
   - `GET /health`
   - `GET /history?limit=50&email=jane@acme.io&event=new.user`
 
@@ -47,3 +46,5 @@ gRPC subscriber that sends a welcome email when it receives the `new.user` event
 | http://localhost:8080/events                         | Returns the list of supported events                       |
 
 - Payload may include `lang` (e.g., `fr`), otherwise `LANG_DEFAULT` is used.
+
+> This project was developed by The calq Studio Team ([N0fish](https://github.com/N0fish), [monkeydioude](https://github.com/monkeydioude)) for the Spendbaker project, in November 2025.

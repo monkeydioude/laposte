@@ -7,9 +7,9 @@ services:
   db:
     image: postgres:16
     environment:
-      POSTGRES_USER: ${PGUSER}
-      POSTGRES_PASSWORD: ${PGPASSWORD}
-      POSTGRES_DB: ${PGDATABASE}
+      POSTGRES_USER: ${PGUSER:-dev}
+      POSTGRES_PASSWORD: ${PGPASSWORD:-dev}
+      POSTGRES_DB: ${PGDATABASE:-email_history}
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:

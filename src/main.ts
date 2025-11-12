@@ -122,7 +122,9 @@ async function main() {
 
   const app = createHttpServer();
   await app.listen({ port: env.HTTP_PORT, host: "0.0.0.0" });
-  console.log(`[email] DRY_RUN: ${env.DRY_RUN}${!env.DRY_RUN ? "\n!! EMAILS WILL BE SENT !!\n!! EMAILS WILL BE SENT !!\n!! EMAILS WILL BE SENT !!" : ""}`);
+  console.log(`[email] DRY_RUN: ${env.DRY_RUN}${
+    !env.DRY_RUN ? "\n!! EMAILS WILL BE SENT !!\n!! EMAILS WILL BE SENT !!\n!! EMAILS WILL BE SENT !!" : ""
+  }`);
   console.log(`[http] listening on: ${env.HTTP_PORT}`);
 
   for (const evt of supportedEvents()) {

@@ -8,7 +8,7 @@ done
 echo "Database is ready."
 
 # Check if schema_migrations table exists
-TABLE_EXISTS=$(psql -tAc "SELECT to_regclass('${DB_SCHEMA}.schema_migrations');")
+TABLE_EXISTS=$(psql -tAc "SELECT to_regclass('email_history.schema_migrations');")
 
 if [ -z "$TABLE_EXISTS" ]; then
   echo "No migration found, applying init.sql..."

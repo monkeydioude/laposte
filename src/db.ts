@@ -3,6 +3,7 @@ import { Pool } from "pg";
 import { env } from "./env";
 import { type HistoryRow } from "./types";
 
+
 function buildPool(): Pool {
   return new Pool({
     host: env.PGHOST || "localhost",
@@ -10,10 +11,11 @@ function buildPool(): Pool {
     user: env.PGUSER || "postgres",
     password: env.PGPASSWORD || "",
     database: env.PGDATABASE || "postgres",
+    options: "-c search_path=email_history"
   });
 }
 
-export const pool = buildPool();
+export const pool = await buildPool().connect();
 
 export async function insertHistory(row: HistoryRow) {
   await pool.query(

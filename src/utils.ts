@@ -1,6 +1,7 @@
 import { env } from "./env";
 import { loadConfig } from "./config";
 
+
 export function supportedEvents(): string[] {
   const cfg = loadConfig();
   return Object.keys(cfg.events);

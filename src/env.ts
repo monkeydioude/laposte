@@ -24,7 +24,6 @@ export const env = {
   HTTP_PORT: Number(process.env.HTTP_PORT ?? 8080),
   LANG_DEFAULT: process.env.LANG_DEFAULT ?? "fr",
   
-  HISTORY_DB_PATH: process.env.HISTORY_DB_PATH ?? "./var/history.sqlite",
   PGHOST: process.env.PGHOST,
   PGPORT: process.env.PGPORT ? Number(process.env.PGPORT) : undefined,
   PGUSER: process.env.PGUSER,
