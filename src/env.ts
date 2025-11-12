@@ -27,11 +27,11 @@ export const env = {
   HISTORY_DB_PATH: process.env.HISTORY_DB_PATH ?? "./var/history.sqlite",
   // Postgres
   // POSTGRES_URL: process.env.POSTGRES_URL,
-  // PGHOST: process.env.PGHOST,
-  // PGPORT: process.env.PGPORT ? Number(process.env.PGPORT) : undefined,
-  // PGUSER: process.env.PGUSER,
-  // PGPASSWORD: process.env.PGPASSWORD,
-  // PGDATABASE: process.env.PGDATABASE,
+  PGHOST: process.env.PGHOST,
+  PGPORT: process.env.PGPORT ? Number(process.env.PGPORT) : undefined,
+  PGUSER: process.env.PGUSER,
+  PGPASSWORD: process.env.PGPASSWORD,
+  PGDATABASE: process.env.PGDATABASE,
 };
 
 export function requireForSending(): string[] {

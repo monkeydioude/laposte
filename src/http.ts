@@ -1,8 +1,8 @@
 import Fastify from "fastify";
 
-import { queryHistory, insertHistory } from "./db";
-import { HistoryRow } from "./types"
 import { loadConfig } from "./config";
+import { queryHistory } from "./db";
+import { HistoryRow } from "./types";
 
 
 export function createHttpServer() {
@@ -28,7 +28,7 @@ export function createHttpServer() {
     const limit = q.limit ? Number(q.limit) : undefined;
     const email = q.email;
     const event = q.event;
-    const rows: HistoryRow[] = queryHistory({ limit, email, event });
+    const rows: HistoryRow[] = await queryHistory({ limit, email, event });
     
     return rows.map((r) => ({
       id: r.id,
@@ -41,24 +41,6 @@ export function createHttpServer() {
       error: r.error,
       payload: JSON.parse(r.payload_json) as Record<string, unknown>,
     }));
-  });
-
-  app.post("/history", async (req, reply) => {
-    const body: any = (req as any).body || {};
-    if (!body.recipient || !body.event) {
-      return reply.code(400).send({ error: "recipient and event are required" });
-    }
-    insertHistory({
-      created_at: new Date().toISOString(),
-      recipient: String(body.recipient),
-      event: String(body.event),
-      lang: String(body.lang || "fr"),
-      subject: String(body.subject || ""),
-      ok: body.ok ? 1 : 0,
-      error: body.error ? String(body.error) : undefined,
-      payload_json: JSON.stringify(body.payload ?? {}),
-    });
-    return { ok: true };
   });
 
   app.get("/events", async () => {

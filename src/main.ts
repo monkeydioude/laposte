@@ -3,13 +3,14 @@ import { env, requireForSending } from "./env";
 import * as grpc from "@grpc/grpc-js";
 import { BrokerClient, Message, Subscriber } from "./grpc/heyo_client.ts";
 
+import { buildEmail } from "./buildEmail.ts";
 import { makeMailer, sendEmailMock } from "./email.ts";
-import { buildEmail } from "./buildEmail.ts"
 import { validatePayload } from "./validatePayload.ts";
 
+import { v4 } from "uuid";
 import { insertHistory } from "./db.ts";
 import { createHttpServer } from "./http.ts";
-import { supportedEvents, resolveLang } from "./utils.ts"
+import { resolveLang, supportedEvents } from "./utils.ts";
 
 
 const broker = new BrokerClient(env.BROKER_ADDR, grpc.credentials.createInsecure());
@@ -28,7 +29,7 @@ const mailer = !env.DRY_RUN
 function handleStreamFor(eventName: string) {
   const sub: Subscriber = {
     event: eventName,
-    clientId: env.SERVICE_ID,
+    clientId: v4(),
     name: env.SERVICE_NAME,
   };
   const stream = broker.subscription(sub);
@@ -62,7 +63,7 @@ function handleStreamFor(eventName: string) {
         `Message (${m.clientName || m.clientId || "unknown"}) < ${
           JSON.stringify({ ok: true, to })
       }`);
-      insertHistory({
+      await insertHistory({
         created_at: new Date().toISOString(),
         recipient: to,
         event: eventName,
@@ -84,7 +85,7 @@ function handleStreamFor(eventName: string) {
         })();
         const payload = typeof raw === "object" && raw ? raw : {};
         const lang = resolveLang(payload as any);
-        insertHistory({
+        await insertHistory({
           created_at: new Date().toISOString(),
           recipient: String((payload as any).email || (payload as any).to || ""),
           event: eventName,
@@ -94,7 +95,9 @@ function handleStreamFor(eventName: string) {
           error: String(err?.message || err),
           payload_json: JSON.stringify(payload),
         });
-      } catch {}
+      } catch (error) {
+        console.error(error);
+      }
     } finally {
       const dt = Date.now() - t0;
       if (dt > 2000) {
@@ -119,12 +122,13 @@ async function main() {
 
   const app = createHttpServer();
   await app.listen({ port: env.HTTP_PORT, host: "0.0.0.0" });
-  console.log(`[http] listening on :${env.HTTP_PORT}`);
+  console.log(`[email] DRY_RUN: ${env.DRY_RUN}${!env.DRY_RUN ? "\n!! EMAILS WILL BE SENT !!\n!! EMAILS WILL BE SENT !!\n!! EMAILS WILL BE SENT !!" : ""}`);
+  console.log(`[http] listening on: ${env.HTTP_PORT}`);
 
   for (const evt of supportedEvents()) {
     try {
       handleStreamFor(evt);
-      console.log(`[subscribe] listening for '${evt}' ...`);
+      console.log(`[subscribe] listening for '${evt}' events`);
     } catch (e: any) {
       console.error(`[subscribe error] ${evt}:`, e?.message || e);
     }

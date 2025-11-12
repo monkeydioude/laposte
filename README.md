@@ -35,7 +35,6 @@ gRPC subscriber that sends a welcome email when it receives the `new.user` event
 - History persisted in SQLite (`HISTORY_DB_PATH`) and exposed via HTTP:
   - `GET /health`
   - `GET /history?limit=50&email=jane@acme.io&event=new.user`
-  - `POST /history` (optional manual insert for tests)
 
 | URL                                                  | Description                                                |
 |:----------------------------------------------------:|:----------------------------------------------------------:|

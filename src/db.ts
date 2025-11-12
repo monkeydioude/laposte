@@ -1,55 +1,59 @@
-import Database from "better-sqlite3";
-import fs from "fs";
-import path from "path";
+import { Pool } from "pg";
 
 import { env } from "./env";
-import { HistoryRow } from "./types"
+import { HistoryRow } from "./types";
 
-
-const dir = path.dirname(env.HISTORY_DB_PATH);
-if (!fs.existsSync(dir)) {
-  fs.mkdirSync(dir, { recursive: true });
+function buildPool(): Pool {
+  // if (env.POSTGRES_URL) {
+  //   return new Pool({ connectionString: env.POSTGRES_URL });
+  // }
+  return new Pool({
+    host: env.PGHOST || "localhost",
+    port: env.PGPORT || 5432,
+    user: env.PGUSER || "postgres",
+    password: env.PGPASSWORD || "",
+    database: env.PGDATABASE || "postgres",
+  });
 }
 
-export const db = new Database(env.HISTORY_DB_PATH);
+export const pool = buildPool();
 
-db.exec(`
-CREATE TABLE IF NOT EXISTS email_history (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  created_at TEXT NOT NULL,
-  recipient TEXT NOT NULL,
-  event TEXT NOT NULL,
-  lang TEXT NOT NULL,
-  subject TEXT,
-  ok INTEGER NOT NULL,
-  error TEXT,
-  payload_json TEXT NOT NULL
-);
-CREATE INDEX IF NOT EXISTS idx_history_created ON email_history(created_at);
-CREATE INDEX IF NOT EXISTS idx_history_recipient ON email_history(recipient);
-CREATE INDEX IF NOT EXISTS idx_history_event ON email_history(event);
-`);
-
-const insertStmt = db.prepare(`
-  INSERT INTO email_history (created_at, recipient, event, lang, subject, ok, error, payload_json)
-  VALUES (@created_at, @recipient, @event, @lang, @subject, @ok, @error, @payload_json)
-`);
-
-export function insertHistory(row: HistoryRow) {
-  insertStmt.run(row);
+export async function insertHistory(row: HistoryRow) {
+  await pool.query(
+    `INSERT INTO email_history
+      (created_at, recipient, event, lang, subject, ok, error, payload_json)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+    [
+      row.created_at,
+      row.recipient,
+      row.event,
+      row.lang,
+      row.subject ?? null,
+      row.ok,
+      row.error ?? null,
+      row.payload_json,
+    ]
+  );
 }
 
-export function queryHistory(params: { limit?: number; email?: string; event?: string }): HistoryRow[] {
-  const parts: string[] = [];
-  const bind: any = {};
+export async function queryHistory(params: { limit?: number; email?: string; event?: string }): Promise<HistoryRow[]> {
+  const where: string[] = [];
+  const values: any[] = [];
+  let idx = 1;
+
   if (params.email) {
-    parts.push("recipient = @email"); bind.email = params.email;
+    where.push(`recipient = $${idx++}`);
+    values.push(params.email);
   }
   if (params.event) {
-    parts.push("event = @event"); bind.event = params.event;
+    where.push(`event = $${idx++}`);
+    values.push(params.event);
   }
-  const where = parts.length ? ("WHERE " + parts.join(" AND ")) : "";
+
+  const clause = where.length ? `WHERE ${where.join(" AND ")}` : "";
   const limit = params.limit ?? 100;
-  const sql = `SELECT * FROM email_history ${where} ORDER BY id DESC LIMIT ${limit}`;
-  return db.prepare(sql).all(bind) as HistoryRow[];
+
+  const sql = `SELECT * FROM email_history ${clause} ORDER BY id DESC LIMIT ${limit}`;
+  const res = await pool.query(sql, values);
+  return res.rows as HistoryRow[];
 }
