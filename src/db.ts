@@ -1,4 +1,4 @@
-import { Pool } from "pg";
+import { Pool, type PoolClient } from "pg";
 
 import { env } from "./env";
 import { type HistoryRow } from "./types";
@@ -15,10 +15,16 @@ function buildPool(): Pool {
   });
 }
 
-export const pool = await buildPool().connect();
+let pool: PoolClient | null = null;
+export async function getPool(): Promise<PoolClient> {
+  if (!pool) {
+    pool = await buildPool().connect();
+  }
+  return pool;
+}
 
 export async function insertHistory(row: HistoryRow) {
-  await pool.query(
+  await pool!.query(
     `INSERT INTO email_history
       (created_at, recipient, event, lang, subject, ok, error, payload_json)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
@@ -53,6 +59,6 @@ export async function queryHistory(params: { limit?: number; email?: string; eve
   const limit = params.limit ?? 100;
 
   const sql = `SELECT * FROM email_history ${clause} ORDER BY id DESC LIMIT ${limit}`;
-  const res = await pool.query(sql, values);
+  const res = await pool!.query(sql, values);
   return res.rows as HistoryRow[];
 }

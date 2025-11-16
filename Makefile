@@ -18,9 +18,10 @@ dpsql:
 
 .PHONY: build
 build:
-	rm -rf build
+	rm -rf dist
+	npm i
 	npm run build
 
 .PHONY: prod
-prod: build
+prod:
 	node dist/main.js

@@ -8,7 +8,7 @@ import { makeMailer, sendEmailMock } from "./email";
 import { validatePayload } from "./validatePayload";
 
 import { v4 } from "uuid";
-import { insertHistory } from "./db";
+import { getPool, insertHistory } from "./db";
 import { createHttpServer } from "./http";
 import { resolveLang, supportedEvents } from "./utils";
 
@@ -116,6 +116,8 @@ function handleStreamFor(eventName: string) {
 }
 
 async function main() {
+  // init
+  await getPool();
   if (!env.DRY_RUN && missing.length) {
     throw new Error("Missing SMTP env: " + missing.join(", "));
   }
