@@ -25,3 +25,10 @@ build:
 .PHONY: prod
 prod:
 	node dist/main.js
+
+.PHONY: dpush
+dpush:
+	docker login
+	docker build -t drannoc/laposte .
+	docker tag drannoc/laposte drannoc/laposte
+	docker push drannoc/laposte
