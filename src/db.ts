@@ -1,4 +1,4 @@
-import { Pool, type PoolClient } from "pg";
+import { Pool } from "pg";
 
 import { env } from "./env";
 import { type HistoryRow } from "./types";
@@ -15,10 +15,10 @@ function buildPool(): Pool {
   });
 }
 
-let pool: PoolClient | null = null;
-export async function getPool(): Promise<PoolClient> {
+let pool: Pool | null = null;
+export async function getPool(): Promise<Pool> {
   if (!pool) {
-    pool = await buildPool().connect();
+    pool = buildPool()
   }
   return pool;
 }
