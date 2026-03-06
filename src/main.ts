@@ -8,7 +8,7 @@ import { makeMailer, sendEmailMock } from "./email";
 import { validatePayload } from "./validatePayload";
 
 import { v4 } from "uuid";
-import { getPool, insertHistory } from "./db";
+import { getPool, insertHistory, tryLockForSending, markSendLogFailed } from "./db";
 import { createHttpServer } from "./http";
 import { resolveLang, supportedEvents } from "./utils";
 
@@ -36,6 +36,7 @@ function handleStreamFor(eventName: string) {
 
   stream.on("data", async (m: Message) => {
     const t0 = Date.now();
+    let dedupId = "";
     try {
       if (m.event !== eventName)
         return;
@@ -46,11 +47,32 @@ function handleStreamFor(eventName: string) {
 
       const raw = JSON.parse(m.data);
       const payload = validatePayload(eventName, raw);
-      const lang = resolveLang(payload);
-      const built = buildEmail(eventName, payload, lang);
-      const to = String(payload.email || payload.to);
+      const to = String(payload.email || payload.to || "");
       if (!to) {
         throw new Error("Missing recipient email in payload");
+      }
+      dedupId = String(payload.dedup_id || "");
+      if (!dedupId) {
+        throw new Error("Missing dedup_id in payload");
+      }
+      const lang = resolveLang(payload);
+      const built = buildEmail(eventName, payload, lang);
+      const locked = await tryLockForSending({ dedup_id: dedupId, email: to });
+      if (!locked) {
+        console.warn(
+          `[dedup] skip duplicate email: dedup_id=${dedupId} email=${to}`
+        );
+        await insertHistory({
+          created_at: new Date().toISOString(),
+          recipient: to,
+          event: eventName,
+          lang,
+          subject: built.subject,
+          ok: 1,
+          error: "skipped_duplicate",
+          payload_json: JSON.stringify(payload),
+        });
+        return;
       }
 
       if (env.DRY_RUN || !mailer) {
@@ -84,10 +106,18 @@ function handleStreamFor(eventName: string) {
           }
         })();
         const payload = typeof raw === "object" && raw ? raw : {};
+        const recipient = String((payload as any).email || (payload as any).to || "");
         const lang = resolveLang(payload as any);
+        if (dedupId && recipient) {
+          await markSendLogFailed({
+            dedup_id: dedupId,
+            email: recipient,
+            error: String(err?.message || err),
+          });
+        }
         await insertHistory({
           created_at: new Date().toISOString(),
-          recipient: String((payload as any).email || (payload as any).to || ""),
+          recipient,
           event: eventName,
           lang,
           subject: "",

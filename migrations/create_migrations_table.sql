@@ -1,4 +1,3 @@
--- migrations/init.sql
 CREATE SCHEMA IF NOT EXISTS email_history;
 SET search_path TO email_history;
 

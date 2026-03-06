@@ -25,6 +25,16 @@ Listen to events through a gRPC event broken and send emails accordingly.
 ```
 @delete.user {"email":"email@email.com","firstname":"Syuzi","lastname":"Dourish","reason":"user request"}
 ```
+```
+@collaborator.invite {"email":"email@gmail.com","message":"Please join the team!","invite_link":"https://acme.com/invite/123","role_viewer": "true"}
+```
+```
+{
+  "email": "user@mail.com",
+  "dedup_id": "reset-password-9a82f3",
+  "name": "John"
+}
+```
 
 ## Notes
 - When `DRY_RUN=true`, emails are not sent — they’re logged to console.

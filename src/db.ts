@@ -3,6 +3,7 @@ import { Pool } from "pg";
 import { env } from "./env";
 import { type HistoryRow } from "./types";
 
+const PG_UNIQUE_VIOLATION = "23505";
 
 function buildPool(): Pool {
   return new Pool({
@@ -11,20 +12,21 @@ function buildPool(): Pool {
     user: env.PGUSER || "postgres",
     password: env.PGPASSWORD || "",
     database: env.PGDATABASE || "postgres",
-    options: "-c search_path=email_history"
+    options: "-c search_path=email_history",
   });
 }
 
 let pool: Pool | null = null;
 export async function getPool(): Promise<Pool> {
   if (!pool) {
-    pool = buildPool()
+    pool = buildPool();
   }
   return pool;
 }
 
 export async function insertHistory(row: HistoryRow) {
-  await pool!.query(
+  const p = await getPool();
+  await p.query(
     `INSERT INTO email_history
       (created_at, recipient, event, lang, subject, ok, error, payload_json)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
@@ -41,7 +43,12 @@ export async function insertHistory(row: HistoryRow) {
   );
 }
 
-export async function queryHistory(params: { limit?: number; email?: string; event?: string }): Promise<HistoryRow[]> {
+export async function queryHistory(params: {
+  limit?: number;
+  email?: string;
+  event?: string;
+}): Promise<HistoryRow[]> {
+  const p = await getPool();
   const where: string[] = [];
   const values: any[] = [];
   let idx = 1;
@@ -57,8 +64,44 @@ export async function queryHistory(params: { limit?: number; email?: string; eve
 
   const clause = where.length ? `WHERE ${where.join(" AND ")}` : "";
   const limit = params.limit ?? 100;
-
   const sql = `SELECT * FROM email_history ${clause} ORDER BY id DESC LIMIT ${limit}`;
-  const res = await pool!.query(sql, values);
+  const res = await p.query(sql, values);
   return res.rows as HistoryRow[];
+}
+
+export async function tryLockForSending(params: {
+  dedup_id: string;
+  email: string;
+}): Promise<boolean> {
+  const p = await getPool();
+  try {
+    await p.query(
+      `INSERT INTO email_send_log (dedup_id, email, error)
+       VALUES ($1, $2, NULL)`,
+      [params.dedup_id, params.email]
+    );
+    return true;
+  } catch (e: any) {
+    if (e?.code === PG_UNIQUE_VIOLATION) {
+      return false;
+    }
+    throw e;
+  }
+}
+
+export async function markSendLogFailed(params: {
+  dedup_id: string;
+  email: string;
+  error: string;
+}): Promise<void> {
+  const p = await getPool();
+
+  await p.query(
+    `UPDATE email_send_log
+     SET error = $3
+     WHERE dedup_id = $1
+       AND email = $2
+       AND error IS NULL`,
+    [params.dedup_id, params.email, params.error]
+  );
 }
