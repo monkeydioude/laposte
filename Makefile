@@ -1,8 +1,16 @@
 .PHONY: dev
-dev:
+dev: install-git-hook
 	npm install
 	docker compose up -d --remove-orphans
 	npm run dev
+
+.PHONY: install-git-hook
+install-git-hook:
+	@echo "🔧 Installing git pre-commit hook..."
+	@mkdir -p .git/hooks
+	@cp scripts/git-hooks/pre-commit .git/hooks/pre-commit
+	@chmod +x .git/hooks/pre-commit
+	@echo "✅ Git pre-commit hook installed."
 
 .PHONY: dexplorer
 dexplorer:
@@ -30,3 +38,11 @@ prod:
 dpush:
 	docker login
 	docker buildx build --platform linux/amd64,linux/arm64 -t drannoc/laposte:latest --push .
+
+.PHONY: test
+test: install-git-hook
+	./scripts/tests.sh
+
+.PHONY: gitleaks
+gitleaks: install-git-hook
+	./scripts/gitleaks.sh
