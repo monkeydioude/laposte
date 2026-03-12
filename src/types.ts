@@ -1,12 +1,5 @@
-/** Payload of the email to send */
 export interface MailPayload {
   to: string;
-  subject: string;
-  text?: string;
-  html?: string;
-}
-
-export interface BuiltEmail {
   subject: string;
   text?: string;
   html?: string;
@@ -20,7 +13,6 @@ export interface TemplatesRoot {
 export interface EventSpec {
   required: string[];
   optional?: string[];
-  /** folder name under templates path, e.g. 'new.user' */
   template: string;
 }
 
@@ -47,4 +39,11 @@ export interface SmtpConfig {
   user: string;
   pass: string;
   from: string;
+}
+
+export interface ValidatedPayload {
+  email: string;
+  dedup_id?: string;
+  lang: string;
+  [key: string]: unknown;
 }

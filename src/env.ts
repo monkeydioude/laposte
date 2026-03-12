@@ -22,7 +22,7 @@ export const env = {
   SMTP_FROM: process.env.SMTP_FROM,
   DRY_RUN: bool(process.env.DRY_RUN, true),
   HTTP_PORT: Number(process.env.HTTP_PORT ?? 8080),
-  LANG_DEFAULT: process.env.LANG_DEFAULT ?? "fr",
+  LANG_DEFAULT: process.env.LANG_DEFAULT ?? "en",
   
   PGHOST: process.env.PGHOST,
   PGPORT: process.env.PGPORT ? Number(process.env.PGPORT) : undefined,

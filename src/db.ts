@@ -1,7 +1,7 @@
 import { Pool } from "pg";
-
 import { env } from "./env";
 import { type HistoryRow } from "./types";
+
 
 const PG_UNIQUE_VIOLATION = "23505";
 
@@ -81,8 +81,8 @@ export async function tryLockForSending(params: {
       [params.dedup_id, params.email]
     );
     return true;
-  } catch (e: any) {
-    if (e?.code === PG_UNIQUE_VIOLATION) {
+  } catch (e: unknown) {
+    if (e instanceof Error && 'code' in e && e.code === PG_UNIQUE_VIOLATION) {
       return false;
     }
     throw e;
@@ -95,7 +95,6 @@ export async function markSendLogFailed(params: {
   error: string;
 }): Promise<void> {
   const p = await getPool();
-
   await p.query(
     `UPDATE email_send_log
      SET error = $3

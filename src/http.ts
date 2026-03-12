@@ -2,7 +2,7 @@ import Fastify from "fastify";
 
 import { loadConfig } from "./config";
 import { queryHistory } from "./db";
-import { type HistoryRow } from "./types";
+import type { HistoryRow } from "./types";
 
 
 export function createHttpServer() {
@@ -24,7 +24,7 @@ export function createHttpServer() {
       payload: Record<string, unknown>;
     }>;
   }>("/history", async (req, reply) => {
-    const q: any = (req as any).query || {};
+    const q = req.query || {};
     const limit = q.limit ? Number(q.limit) : undefined;
     const email = q.email;
     const event = q.event;

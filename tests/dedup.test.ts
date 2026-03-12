@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { Pool } from "pg";
 
+
 const TEST_DB = {
   host: process.env.PGHOST ?? "localhost",
   port: Number(process.env.PGPORT ?? "55432"),
@@ -42,7 +43,8 @@ async function tryLockForSendingDirect(dedupId: string, email: string): Promise<
     );
     return true;
   } catch (e: any) {
-    if (e?.code === PG_UNIQUE_VIOLATION) return false;
+    if (e?.code === PG_UNIQUE_VIOLATION)
+      return false;
     throw e;
   }
 }
@@ -61,19 +63,6 @@ async function markSendLogFailedDirect(
     [dedupId, email, error]
   );
 }
-
-// async function hasSuccessfulLockDirect(dedupId: string, email: string): Promise<boolean> {
-//   const res = await pool.query(
-//     `SELECT 1
-//      FROM email_history.email_send_log
-//      WHERE dedup_id = $1
-//        AND email = $2
-//        AND error IS NULL
-//      LIMIT 1`,
-//     [dedupId, email]
-//   );
-//   return res.rows.length > 0;
-// }
 
 describe("email dedup by dedup_id", () => {
   beforeAll(async () => {

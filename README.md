@@ -18,22 +18,23 @@ Listen to events through a gRPC event broken and send emails accordingly.
 - `LANG_DEFAULT` - Default language used for templates.
 
 ## With the broker explorer (make dexplorer), send a message to your broker (event: `new.user`) with JSON payload:
-```
+```json
 @new.user {"email":"email@email.com","firstname":"Syuzi","lastname":"Dourish"}
 ```
-## With the broker explorer (make dexplorer), send a message to your broker (event: `delete.user`) with JSON payload:
+## Deduplication (Optional)
+- **If `dedup_id` is provided**: The service guarantees the email is sent only once per `(dedup_id, email)` pair. If an SMTP error occurs, the lock is released, allowing subsequent retries to succeed.
+```json
+@new.user {"email":"email@email.com","dedup_id":"new-user-9a82f3","firstname":"Syuzi","lastname":"Dourish"}
 ```
+## With the broker explorer (make dexplorer), send a message to your broker (event: `delete.user`) with JSON payload:
+```json
 @delete.user {"email":"email@email.com","firstname":"Syuzi","lastname":"Dourish","reason":"user request"}
 ```
-```
+```json
 @collaborator.invite {"email":"email@gmail.com","message":"Please join the team!","invite_link":"https://acme.com/invite/123","role_viewer": "true"}
 ```
-```
-{
-  "email": "user@mail.com",
-  "dedup_id": "reset-password-9a82f3",
-  "name": "John"
-}
+```json
+@reset.password {"email":"email@email.com","dedup_id":"reset-password-9a82f3","firstname":"Syuzi","lastname":"Dourish"}
 ```
 
 ## Notes
