@@ -12,18 +12,21 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "tsup": "^8.5.0",
     "@types/js-yaml": "^4.0.9",
-    "@types/node": "^24.10.1",
+    "@types/node": "^24.11.0",
     "@types/nodemailer": "^7.0.3",
     "@types/pg": "^8.15.6",
     "protoc": "^33.0.0",
     "ts-proto": "^2.8.3",
-    "tsx": "^4.20.6",
-    "typescript": "^5.9.3"
+    "tsup": "^8.5.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
   },
   "scripts": {
     "dev": "tsx watch src/main.ts",
-    "build": "tsup src/main.ts --format esm,cjs --dts --sourcemap --clean --out-dir dist"
+    "build": "tsup src/main.ts --format esm,cjs --dts --sourcemap --clean --out-dir dist",
+    "test": "vitest run --environment node",
+    "test:watch": "vitest --environment node"
   }
 }

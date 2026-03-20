@@ -46,3 +46,16 @@ test: install-git-hook
 .PHONY: gitleaks
 gitleaks: install-git-hook
 	./scripts/gitleaks.sh
+
+.PHONY: test test-up test-down
+test-up:
+	docker compose up -d db_test
+	@echo "waiting for db_test..."
+	@until docker compose exec -T db_test pg_isready -U test -d test > /dev/null 2>&1; do sleep 1; done
+
+test:
+	$(MAKE) test-up
+	PGHOST=localhost PGPORT=55432 PGUSER=test PGPASSWORD=test PGDATABASE=test npm run test
+
+test-down:
+	docker compose down -v
