@@ -1,12 +1,12 @@
 import * as grpc from "@grpc/grpc-js";
-import { env, requireForSending } from "./env";
-import { BrokerClient, Message, Subscriber } from "./grpc/heyo_client";
-import { makeMailer } from "./email";
 import { v4 } from "uuid";
 import { getPool } from "./db";
+import { makeMailer } from "./email";
+import { processEmailTask } from "./emailService";
+import { env, requireForSending } from "./env";
+import { BrokerClient, Message, Subscriber } from "./grpc/heyo_client";
 import { createHttpServer } from "./http";
 import { supportedEvents } from "./utils";
-import { processEmailTask } from "./emailService";
 
 
 const broker = new BrokerClient(env.BROKER_ADDR, grpc.credentials.createInsecure());
@@ -55,7 +55,7 @@ async function main() {
   }
 
   const app = createHttpServer();
-  await app.listen({ port: env.HTTP_PORT, host: "0.0.0.0" });
+  await app.listen({ port: env.HTTP_PORT, host: "0.0.0.0", path: "/laposte" });
   console.log(`[email] DRY_RUN: ${env.DRY_RUN}${
     !env.DRY_RUN ? "\n!! EMAILS WILL BE SENT !!\n!! EMAILS WILL BE SENT !!\n!! EMAILS WILL BE SENT !!" : ""
   }`);

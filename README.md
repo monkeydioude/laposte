@@ -47,14 +47,14 @@ Listen to events through a gRPC event broken and send emails accordingly.
   - `GET /health`
   - `GET /history?limit=50&email=jane@acme.io&event=new.user`
 
-| URL                                                  | Description                                                |
-|:----------------------------------------------------:|:----------------------------------------------------------:|
-| http://localhost:8080/health                         | Check if the server is running → responds with {"ok":true} |
-| http://localhost:8080/history                        | List of the most recent emails (50 by default)             |
-| http://localhost:8080/history?limit=10               | Limit the result to 10 entries                             |
-| http://localhost:8080/history?event=new.user         | Filter by event type                                       |
-| http://localhost:8080/history?email=test@example.com | Filter by recipient email                                  |
-| http://localhost:8080/events                         | Returns the list of supported events                       |
+| URL                                                          | Description                                                |
+|:------------------------------------------------------------:|:----------------------------------------------------------:|
+| http://localhost:8080/laposte/health                         | Check if the server is running → responds with {"ok":true} |
+| http://localhost:8080/laposte/history                        | List of the most recent emails (50 by default)             |
+| http://localhost:8080/laposte/history?limit=10               | Limit the result to 10 entries                             |
+| http://localhost:8080/laposte/history?event=new.user         | Filter by event type                                       |
+| http://localhost:8080/laposte/history?email=test@example.com | Filter by recipient email                                  |
+| http://localhost:8080/laposte/events                         | Returns the list of supported events                       |
 
 - Payload may include `lang` (e.g., `fr`), otherwise `LANG_DEFAULT` is used.
 
