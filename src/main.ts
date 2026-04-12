@@ -55,7 +55,7 @@ async function main() {
   }
 
   const app = createHttpServer();
-  await app.listen({ port: env.HTTP_PORT, host: "0.0.0.0", path: "/laposte" });
+  await app.listen({ port: env.HTTP_PORT, host: "0.0.0.0" });
   console.log(`[email] DRY_RUN: ${env.DRY_RUN}${
     !env.DRY_RUN ? "\n!! EMAILS WILL BE SENT !!\n!! EMAILS WILL BE SENT !!\n!! EMAILS WILL BE SENT !!" : ""
   }`);
