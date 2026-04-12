@@ -19,7 +19,6 @@ ENV NODE_ENV=production
 
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
-COPY --chown=65532:65532 config.yml ./config.yml
 COPY --chown=65532:65532 templates ./templates
 COPY --chown=65532:65532 migrations ./migrations
 
