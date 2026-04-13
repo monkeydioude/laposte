@@ -21,7 +21,6 @@ RUN apk add --no-cache busybox-binsh wget
 
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
-COPY --chown=65532:65532 templates ./templates
 COPY --chown=65532:65532 migrations ./migrations
 
 USER 65532
