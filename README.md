@@ -10,12 +10,21 @@ Listen to events through a gRPC event broken and send emails accordingly.
 - `BROKER_ADDR` — gRPC broker address.
 - `SERVICE_ID` — your `clientId` (default: `email-service`).
 - `SERVICE_NAME` — human-readable service name (default: `email-service`).
-- `CONFIG_PATH` - Path to the YAML configuration file defining events and templates (default: `./config.yml`).
+- `CONFIG_PATHS` - Comma-separated YAML config files, one per product, each defining its events and templates (default: `./config.yml`). `CONFIG_PATH` (single file) still works.
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` — SMTP configuration parameters.
-- `SMTP_FROM` — sender email address (required).
+- `SMTP_FROM` — default sender email address (required). A config file can set its own with a top-level `from:`.
 - `DRY_RUN` — if `true`, emails are not sent but only logged.
 - `HTTP_PORT` - Port for the HTTP API server (default: `8080`).
 - `LANG_DEFAULT` - Default language used for templates.
+
+## Several products
+One instance serves several products, each with its own config file:
+```sh
+CONFIG_PATHS=/srv/sb_back/config.yml,/srv/kabane/laposte/config.yml
+```
+- Templates are found next to the config file declaring the event (`templates.path` is relative to it).
+- `from: "Kabane <hello@kabane.io>"` at the top of a config sets the sender of its events; the SMTP account must be allowed to send as it.
+- Heyo routes by event name only: an event name must be declared in one config file only (boot fails otherwise). Prefix a product's events, e.g. `kabane.welcome`.
 
 ## With the broker explorer (make dexplorer), send a message to your broker (event: `new.user`) with JSON payload:
 ```json

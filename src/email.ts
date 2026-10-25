@@ -30,7 +30,7 @@ export function makeMailer(smtp: SmtpConfig) {
   return async function sendMail(payload: MailPayload): Promise<void> {
     validateMailPayload(payload);
     const info = await transport.sendMail({
-      from: smtp.from,
+      from: payload.from ?? smtp.from,
       to: payload.to,
       subject: payload.subject,
       text: payload.text,
@@ -41,11 +41,11 @@ export function makeMailer(smtp: SmtpConfig) {
   };
 }
 
-export async function sendEmailMock(to: string, subject: string, text: string | undefined, html?: string) {
+export async function sendEmailMock(to: string, subject: string, text: string | undefined, html?: string, from?: string) {
   if (!subject || !subject.trim()) {
     throw new Error("Email subject is empty (mock mode)");
   }
   console.log(
-    `[email MOCK] to=${to} | subject="${subject}" | text="${(text ?? '').slice(0, 120)}"${html ? " | html=YES" : ""}`
+    `[email MOCK] to=${to} | from=${from ?? env.SMTP_FROM ?? ""} | subject="${subject}" | text="${(text ?? '').slice(0, 120)}"${html ? " | html=YES" : ""}`
   );
 }

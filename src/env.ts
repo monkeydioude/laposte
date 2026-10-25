@@ -13,7 +13,8 @@ export const env = {
   SERVICE_ID: process.env.SERVICE_ID ?? "email-service",
   SERVICE_NAME: process.env.SERVICE_NAME ?? "email-service",
 
-  CONFIG_PATH: process.env.CONFIG_PATH ?? "./config.yml",
+  // Comma-separated config files, one per product. CONFIG_PATH is the former single-file name.
+  CONFIG_PATHS: process.env.CONFIG_PATHS ?? process.env.CONFIG_PATH ?? "./config.yml",
 
   SMTP_HOST: process.env.SMTP_HOST,
   SMTP_PORT: Number(process.env.SMTP_PORT ?? 587),
