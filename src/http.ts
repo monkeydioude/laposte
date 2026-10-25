@@ -1,8 +1,8 @@
 import Fastify from "fastify";
 
-import { loadConfig } from "./config";
 import { queryHistory } from "./db";
 import type { HistoryRow } from "./types";
+import { supportedEvents } from "./utils";
 
 
 export function createHttpServer() {
@@ -44,8 +44,7 @@ export function createHttpServer() {
   });
 
   app.get("/events", async () => {
-    const cfg = loadConfig();
-    return { events: Object.keys(cfg.events) };
+    return { events: supportedEvents() };
   });
 
   return app;

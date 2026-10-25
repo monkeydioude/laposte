@@ -1,25 +1,21 @@
 import * as fs from "fs";
 import * as path from "path";
 
-import { getEventSpec, loadConfig } from "./config";
-import { env } from "./env";
+import { type ResolvedEvent } from "./types";
 import { renderTemplate } from "./utils";
 
 
 export function buildEmail(
   event: string,
+  spec: ResolvedEvent,
   payload: Record<string, unknown>,
   lang: string
 ) {
   try {
-    const cfg = loadConfig();
-    const spec = getEventSpec(event);
-
-    const langs = cfg.templates.langs;
-    const root = cfg.templates.path;
+    const langs = spec.langs;
     const effectiveLang = langs.includes(lang) ? lang : langs[0];
 
-    const dir = path.resolve(path.dirname(env.CONFIG_PATH), root, spec.template, effectiveLang!);
+    const dir = path.join(spec.templatesDir, spec.template, effectiveLang!);
     const subjectPath = path.join(dir, "subject.txt");
     const textPath = path.join(dir, "text.txt");
     const htmlPath = path.join(dir, "template.html");
@@ -48,7 +44,7 @@ export function buildEmail(
       const htmlRaw = fs.readFileSync(htmlPath, "utf8");
       html = renderTemplate(htmlRaw, { SUBJECT: subject, ...dict });
     }
-    return { subject, text, html };
+    return { subject, text, html, from: spec.from };
   } catch (e: any) {
     const msg = e?.message || String(e);
     throw new Error(`[buildEmail] ${msg}`);

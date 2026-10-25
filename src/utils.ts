@@ -1,10 +1,9 @@
 import { env } from "./env";
-import { loadConfig } from "./config";
+import { loadEvents } from "./config";
 
 
 export function supportedEvents(): string[] {
-  const cfg = loadConfig();
-  return Object.keys(cfg.events);
+  return Object.keys(loadEvents());
 }
 
 export function resolveLang(payload: Record<string, unknown>): string {

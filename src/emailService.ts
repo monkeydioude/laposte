@@ -1,5 +1,6 @@
 import { env } from "./env";
 import { buildEmail } from "./buildEmail";
+import { getEventSpec } from "./config";
 import { sendEmailMock } from "./email";
 import { validatePayload } from "./validatePayload";
 import { insertHistory, tryLockForSending, markSendLogFailed } from "./db";
@@ -35,11 +36,11 @@ export async function processEmailTask(
       }
     }
 
-    const built = buildEmail(eventName, payload, lang);
+    const built = buildEmail(eventName, getEventSpec(eventName), payload, lang);
     if (env.DRY_RUN || !mailer) {
-      await sendEmailMock(email, built.subject, built.text, built.html);
+      await sendEmailMock(email, built.subject, built.text, built.html, built.from);
     } else {
-      await mailer({ to: email, subject: built.subject, text: built.text, html: built.html });
+      await mailer({ to: email, from: built.from, subject: built.subject, text: built.text, html: built.html });
     }
     console.log(
       `Message (${msg.clientName || msg.clientId || "unknown"}) < ${
